@@ -44,20 +44,35 @@ public class  graph<Type> {
     }
     public ArrayList<Node> getEdges(Node from) {
         return (ArrayList<Node>)from.edges;
-
-
     }
 
     public boolean depthFirstSearch(Type source, Type destination){
         Node from= get(source);
         Node to = get(destination);
-        if (from != null && to != null) {
-            List<Node> visited = new ArrayList<>();
-
-
+        if (from == null ||to == null) {
+           return false;
+        }
+        // Array to track visited nodes (use an index-based approach for efficient access)
+        boolean[] visited = new boolean[nodes.size()];
+        // Start DFS traversal from the source node
+        return dfs(from, to, visited);
+    }
+    private boolean dfs(Node from, Node to, boolean[] visited) {
+        int index=  nodes.indexOf(from);
+        if (visited[index]) {
+            return false;
+        }
+        visited[index] = true;
+        if (from.equals(to)) {
+            return true;
+        }
+        for (Node node : from.edges) {
+            if (dfs(node, to, visited)) {
+                return true;
+            }
 
         }
+        return false;
 
     }
-
 }

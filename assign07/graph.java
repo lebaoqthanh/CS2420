@@ -42,11 +42,12 @@ public class graph<Type> {
     public void setEdge(Type from, Type to) {
         Node fromNode = get(from);
         Node toNode = get(to);
-        if (fromNode != null && toNode != null) {
-            fromNode.edges.add(toNode);
-            toNode.edges.add(fromNode);
+        if (fromNode == null || toNode == null) {
+            throw new IllegalArgumentException("One or both vertices not found.");
         }
+        fromNode.edges.add(toNode); // Remove the line that makes it undirected
     }
+
 
     public List<Node> getEdges(Type from) {
         Node node = get(from);
@@ -121,40 +122,47 @@ public class graph<Type> {
         }
         return result;
     }
-    public List<Type> topoSort(){
-        List<Type> result= new ArrayList<>();
-        int[]inDegree =new int[nodes.size()];
-        List<Node> nodeList= new ArrayList<>(nodes.values());
-        Queue<Node> queue= new LinkedList<>();
-        for (int i = 0; i < nodeList.size(); i++) {
-            Node node = nodeList.get(i);
+    public List<Type> topoSort() {
+        List<Type> result = new ArrayList<>();
+        Map<Node, Integer> inDegree = new HashMap<>();
+        Queue<Node> queue = new LinkedList<>();
+
+        // Calculate in-degrees
+        for (Node node : nodes.values()) {
+            inDegree.put(node, 0);
+        }
+        for (Node node : nodes.values()) {
             for (Node neighbor : node.edges) {
-                int index = nodeList.indexOf(neighbor);
-                inDegree[index]++;
+                inDegree.put(neighbor, inDegree.get(neighbor) + 1);
             }
         }
-        for (int i=0; i< nodeList.size(); i++) {
-            if (inDegree[i]==0){
-                result.add(nodeList.get(i).data);
+
+        // Add nodes with in-degree 0 to the queue
+        for (Node node : nodes.values()) {
+            if (inDegree.get(node) == 0) {
+                queue.add(node);
             }
         }
-        while(!queue.isEmpty()){
-            Node current= queue.poll();
+
+        // Process the queue
+        while (!queue.isEmpty()) {
+            Node current = queue.poll();
             result.add(current.data);
+
             for (Node neighbor : current.edges) {
-                int index = nodeList.indexOf(neighbor);
-                inDegree[index]--;
-                if (inDegree[index]==0){
+                inDegree.put(neighbor, inDegree.get(neighbor) - 1);
+                if (inDegree.get(neighbor) == 0) {
                     queue.add(neighbor);
                 }
             }
         }
-        if (result.size()!= nodes.size()){
-            throw new RuntimeException("CYCLE DETECETED");
 
+        // Check for cycles
+        if (result.size() != nodes.size()) {
+            throw new IllegalArgumentException("Graph contains a cycle");
         }
-        return result;
 
+        return result;
     }
 
 

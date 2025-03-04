@@ -23,7 +23,12 @@ public class graph<Type> {
     }
 
     public void add(Type vertex) {
-        nodes.putIfAbsent(vertex, new Node(vertex));
+        if (!nodes.containsKey(vertex)) {
+            nodes.put(vertex, new Node(vertex));
+        }
+       else{
+           return;
+        }
     }
 
     public Node get(Type vertex) {
@@ -116,7 +121,42 @@ public class graph<Type> {
         }
         return result;
     }
+    public List<Type> topoSort(){
+        List<Type> result= new ArrayList<>();
+        int[]inDegree =new int[nodes.size()];
+        List<Node> nodeList= new ArrayList<>(nodes.values());
+        Queue<Node> queue= new LinkedList<>();
+        for (int i = 0; i < nodeList.size(); i++) {
+            Node node = nodeList.get(i);
+            for (Node neighbor : node.edges) {
+                int index = nodeList.indexOf(neighbor);
+                inDegree[index]++;
+            }
+        }
+        for (int i=0; i< nodeList.size(); i++) {
+            if (inDegree[i]==0){
+                result.add(nodeList.get(i).data);
+            }
+        }
+        while(!queue.isEmpty()){
+            Node current= queue.poll();
+            result.add(current.data);
+            for (Node neighbor : current.edges) {
+                int index = nodeList.indexOf(neighbor);
+                inDegree[index]--;
+                if (inDegree[index]==0){
+                    queue.add(neighbor);
+                }
+            }
+        }
+        if (result.size()!= nodes.size()){
+            throw new RuntimeException("CYCLE DETECETED");
+
+        }
+        return result;
+
+    }
+
 
 }
-
 

@@ -9,11 +9,11 @@ public class GraphUtility {
             throw new IllegalArgumentException("Sources and destinations lists must have the same size");
         }
 
-        graph<Type> graph = new graph<>();
+        Graph<Type> graph = new Graph<>();
         for (int i = 0; i < sources.size(); i++) {
             graph.add(sources.get(i));
             graph.add(destinations.get(i));
-            graph.setEdge(sources.get(i), destinations.get(i));
+            graph.addEdge(sources.get(i), destinations.get(i));
         }
 
         if (graph.get(srcData) == null || graph.get(dstData) == null) {
@@ -28,11 +28,11 @@ public class GraphUtility {
             throw new IllegalArgumentException("Sources and destinations lists must have the same size");
         }
 
-        graph<Type> graph = new graph<>();
+        Graph<Type> graph = new Graph<>();
         for (int i = 0; i < sources.size(); i++) {
             graph.add(sources.get(i));
             graph.add(destinations.get(i));
-            graph.setEdge(sources.get(i), destinations.get(i));
+            graph.addEdge(sources.get(i), destinations.get(i));
         }
 
         if (graph.get(srcData) == null || graph.get(dstData) == null) {
@@ -52,11 +52,11 @@ public class GraphUtility {
             throw new IllegalArgumentException("Sources and destinations lists must have the same size");
         }
 
-        graph<Type> graph = new graph<>();
+        Graph<Type> graph = new Graph<>();
         for (int i = 0; i < sources.size(); i++) {
             graph.add(sources.get(i));
             graph.add(destinations.get(i));
-            graph.setEdge(sources.get(i), destinations.get(i));
+            graph.addEdge(sources.get(i), destinations.get(i));
         }
 
         List<Type> sortedList = graph.topoSort();

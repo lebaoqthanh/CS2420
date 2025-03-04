@@ -1,7 +1,7 @@
 package assign07;
 import java.util.*;
 
-public class graph<Type> {
+public class Graph<Type> {
     private HashMap<Type, Node> nodes;
 
 
@@ -17,7 +17,7 @@ public class graph<Type> {
         }
     }
 
-    public graph() {
+    public Graph() {
         nodes = new HashMap<Type,Node>();
 
     }
@@ -26,8 +26,8 @@ public class graph<Type> {
         if (!nodes.containsKey(vertex)) {
             nodes.put(vertex, new Node(vertex));
         }
-       else{
-           return;
+        else{
+            return;
         }
     }
 
@@ -39,14 +39,20 @@ public class graph<Type> {
         return nodes.size();
     }
 
-    public void setEdge(Type from, Type to) {
+    public void addEdge(Type from, Type to) {
+        if (!nodes.containsKey(from)) {
+            add(from);  // Automatically add the missing vertex
+        }
+        if (!nodes.containsKey(to)) {
+            add(to);  // Automatically add the missing vertex
+        }
+
         Node fromNode = get(from);
         Node toNode = get(to);
-        if (fromNode == null || toNode == null) {
-            throw new IllegalArgumentException("One or both vertices not found.");
-        }
-        fromNode.edges.add(toNode); // Remove the line that makes it undirected
+
+        fromNode.edges.add(toNode);
     }
+
 
 
     public List<Node> getEdges(Type from) {
@@ -127,24 +133,26 @@ public class graph<Type> {
         Map<Node, Integer> inDegree = new HashMap<>();
         Queue<Node> queue = new LinkedList<>();
 
-        // Calculate in-degrees
+        // Initialize in-degree of all nodes
         for (Node node : nodes.values()) {
             inDegree.put(node, 0);
         }
+
+        // Compute in-degrees
         for (Node node : nodes.values()) {
             for (Node neighbor : node.edges) {
                 inDegree.put(neighbor, inDegree.get(neighbor) + 1);
             }
         }
 
-        // Add nodes with in-degree 0 to the queue
+        // Enqueue nodes with in-degree 0
         for (Node node : nodes.values()) {
             if (inDegree.get(node) == 0) {
                 queue.add(node);
             }
         }
 
-        // Process the queue
+        // Process nodes in topological order
         while (!queue.isEmpty()) {
             Node current = queue.poll();
             result.add(current.data);
@@ -157,14 +165,14 @@ public class graph<Type> {
             }
         }
 
-        // Check for cycles
+        // If all nodes are not processed, there's a cycle
         if (result.size() != nodes.size()) {
-            throw new IllegalArgumentException("Graph contains a cycle");
+            return Collections.emptyList(); // Return an empty list instead of throwing an exception
         }
 
         return result;
     }
 
 
-}
 
+}

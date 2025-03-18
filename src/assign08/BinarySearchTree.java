@@ -3,8 +3,11 @@ package assign08;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.*;
-import java.util.NoSuchElementException;
 
+/**
+ * BinarySearchTree implements a SortedSet.
+ * It supports typical binary search tree operations including insertion, deletion, traversal, and iteration.
+ */
 public class BinarySearchTree<Type extends Comparable<? super Type>> implements SortedSet<Type> {
     private class BinaryNode {
         public Type data;
@@ -104,20 +107,26 @@ public class BinarySearchTree<Type extends Comparable<? super Type>> implements 
     }
 
     public boolean remove(Type item) {
+        int initialSize = size;
         root = removeRecursive(root, item);
-        return root != null;
+        return size < initialSize; // Return true only if an item was removed
     }
 
     private BinaryNode removeRecursive(BinaryNode node, Type item) {
         if (node == null) return null;
+
         int cmp = item.compareTo(node.data);
         if (cmp < 0) {
             node.leftChild = removeRecursive(node.leftChild, item);
         } else if (cmp > 0) {
             node.rightChild = removeRecursive(node.rightChild, item);
         } else {
+            size--; // Decrement size when an element is removed
+
             if (node.leftChild == null) return node.rightChild;
             if (node.rightChild == null) return node.leftChild;
+
+            // Node has two children: Find the in-order successor
             BinaryNode successor = findMinNode(node.rightChild);
             node.data = successor.data;
             node.rightChild = removeRecursive(node.rightChild, successor.data);
@@ -132,13 +141,13 @@ public class BinarySearchTree<Type extends Comparable<? super Type>> implements 
         return node;
     }
 
-    public Type first() throws NoSuchElementException {
+    public Type first() {
         Type min = findMin();
         if (min == null) throw new NoSuchElementException();
         return min;
     }
 
-    public Type last() throws NoSuchElementException {
+    public Type last() {
         Type max = findMax();
         if (max == null) throw new NoSuchElementException();
         return max;
@@ -160,6 +169,9 @@ public class BinarySearchTree<Type extends Comparable<? super Type>> implements 
     public Iterator<Type> iterator() {
         return new Iterator<Type>() {
             private Stack<BinaryNode> stack = new Stack<>();
+            private BinaryNode lastVisited = null;
+            private boolean canRemove = false;
+
             { pushLeft(root); }
 
             private void pushLeft(BinaryNode node) {
@@ -175,9 +187,16 @@ public class BinarySearchTree<Type extends Comparable<? super Type>> implements 
 
             public Type next() {
                 if (!hasNext()) throw new NoSuchElementException();
-                BinaryNode node = stack.pop();
-                pushLeft(node.rightChild);
-                return node.data;
+                lastVisited = stack.pop();
+                pushLeft(lastVisited.rightChild);
+                canRemove = true;
+                return lastVisited.data;
+            }
+
+            public void remove() {
+                if (!canRemove) throw new IllegalStateException("next() must be called before remove()");
+                BinarySearchTree.this.remove(lastVisited.data);
+                canRemove = false;
             }
         };
     }
